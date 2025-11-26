@@ -1,15 +1,15 @@
 class EpidemicModel:
     """Base general para modelos tipo SIR/SIS/etc."""
-    def __init__(self, beta, erre):
+    def __init__(self, beta, r):
         self.beta = beta
-        self.erre = erre
+        self.r = r
 
-    def dS_dt(self, S, I):
-        """Ecuación diferencial para S."""
-        # Luego ponemos la fórmula correcta según el modelo
-        return -self.beta * I * S + self.erre + I
+    def dS_dt(self, S, I, N):
+        """Ecuación diferencial para S (versión desnormalizada)."""
+        return -self.beta * (I / N) * S + self.r * I
 
-    def dI_dt(self, S, I):
-        """Ecuación diferencial para I."""
-        return self.beta * I * S - self.erre * I
+    def dI_dt(self, S, I, N):
+        """Ecuación diferencial para I (versión desnormalizada)."""
+        return self.beta * (I / N) * S - self.r * I
+
 

@@ -24,8 +24,8 @@ class Simulator:
     def step(self):
         """Avanza la simulación un paso en el tiempo."""
         
-        dS = self.model.dS_dt(self.S, self.I)
-        dI = self.model.dI_dt(self.S, self.I)
+        dS = self.model.dS_dt(self.S, self.I, self.N)
+        dI = self.model.dI_dt(self.S, self.I, self.N)
         
         # Actualizamos estado con método de Euler
         self.S += dS * self.dt 

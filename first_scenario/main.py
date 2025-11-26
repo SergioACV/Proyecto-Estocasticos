@@ -12,7 +12,7 @@ S0 = N-I0 # nodes initially susceptible
 
 #rates
 beta = 1.62
-erre = 2
+r = 2
 
 assert(I0<=N)
 
@@ -20,7 +20,7 @@ assert(I0<=N)
 initial_state = [S0,I0]
 
 #Model
-model = EpidemicModel(beta,erre)
+model = EpidemicModel(beta,r)
 
 #Simulator
 simulator = Simulator(model,initial_state,dt,TOTAL_TIME)
