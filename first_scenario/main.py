@@ -7,8 +7,8 @@ dt = 1.0 #1 hour
 
 #INITIAL CONDITIONS
 N = 10000 # nodes on all network
-I0 = 15 #15 nodes initially infected
-S0 = N-I0
+I0 = 15 # nodes initially infected
+S0 = N-I0 # nodes initially susceptible
 
 #rates
 beta = 1.62

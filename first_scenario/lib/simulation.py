@@ -6,12 +6,20 @@ class Simulator:
         
         # Estado poblacional (no por nodo)
         self.S, self.I = initial_state
+        self.N = self.S + self.I
+        
         
         self.dt = dt
         self.total_time = total_time
         self.time = 0
-        
-        self.history = []  # guardamos evolución temporal
+
+        self.initialize_statistics()
+
+    def initialize_statistics(self):
+        self.t_values = [0.0]
+        self.S_values = [self.S]
+        self.I_values = [self.I]
+        self.history = [(0.0, self.S, self.I)]
 
     def step(self):
         """Avanza la simulación un paso en el tiempo."""
@@ -20,14 +28,61 @@ class Simulator:
         dI = self.model.dI_dt(self.S, self.I)
         
         # Actualizamos estado con método de Euler
-        self.S += dS * self.dt
+        self.S += dS * self.dt 
         self.I += dI * self.dt
-        
 
         self.time += self.dt
+
+        self.register_history()
+ 
+    def register_history(self):
+        self.t_values.append(self.time)
+        self.S_values.append(self.S)
+        self.I_values.append(self.I)
         self.history.append((self.time, self.S, self.I))
+
+    def compute_gain(self, P):
+        """
+        Calcula G = (1/T) * ∫ P(t) dt usando regla del trapecio.
+        P es una lista de valores P(t).
+        """
+        total_area = 0.0
+
+        # Regla del trapecio sobre todos los intervalos
+        for i in range(1, len(self.t_values)):
+            t_prev = self.t_values[i-1]
+            t_curr = self.t_values[i]
+
+            P_prev = P[i-1]
+            P_curr = P[i]
+
+            dt = t_curr - t_prev
+            area = 0.5 * (P_prev + P_curr) * dt
+            total_area += area
+
+        return total_area / self.total_time
+    
+    def compute_gain_attacker(self):
+        """
+        El atacante controla I(t)/N.
+        """
+        P_att = [I / self.N for I in self.I_values]
+        return self.compute_gain(P_att)
+    
+    def compute_gain_defender(self):
+        """
+        El defensor controla S(t)/N.
+        (en el modelo simple SI)
+        """
+        P_def = [S / self.N for S in self.S_values]
+        return self.compute_gain(P_def)
+
 
     def run(self):
         """Corre la simulación completa."""
         while self.time < self.total_time:
             self.step()
+        
+        self.gain_attacker = self.compute_gain_attacker()
+        self.gain_defender = self.compute_gain_defender()
+
