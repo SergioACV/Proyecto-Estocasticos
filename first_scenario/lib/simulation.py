@@ -8,7 +8,6 @@ class Simulator:
         self.S, self.I = initial_state
         self.N = self.S + self.I
         
-        
         self.dt = dt
         self.total_time = total_time
         self.time = 0
@@ -20,6 +19,7 @@ class Simulator:
         self.S_values = [self.S]
         self.I_values = [self.I]
         self.history = [(0.0, self.S, self.I)]
+        self.total_disinfections = 0
 
     def step(self):
         """Avanza la simulación un paso en el tiempo."""
@@ -30,6 +30,10 @@ class Simulator:
         # Actualizamos estado con método de Euler
         self.S += dS * self.dt 
         self.I += dI * self.dt
+
+        # Count number of disinfections
+        disinf = self.model.disinfections_per_dt(self.I) * self.dt
+        self.total_disinfections += disinf
 
         self.time += self.dt
 
@@ -77,6 +81,24 @@ class Simulator:
         P_def = [S / self.N for S in self.S_values]
         return self.compute_gain(P_def)
 
+    def compute_defender_cost(self):
+        k = self.model.cost_defender  
+        return self.total_disinfections * k
+    
+    def compute_attacker_cost(self):
+        return self.model.cost_attacker
+
+    def compute_defender_payoff(self):
+        """
+        Payoff del defensor = Ganancia - Costo
+        """
+        return self.gain_defender - self.cost_defender
+
+    def compute_attacker_payoff(self):
+        """
+        Payoff del atacante = Ganancia - Costo
+        """
+        return self.gain_attacker - self.cost_attacker
 
     def run(self):
         """Corre la simulación completa."""
@@ -85,4 +107,10 @@ class Simulator:
         
         self.gain_attacker = self.compute_gain_attacker()
         self.gain_defender = self.compute_gain_defender()
+
+        self.cost_defender = self.compute_defender_cost()
+        self.cost_attacker = self.compute_attacker_cost()
+
+        self.payoff_attacker = self.compute_attacker_payoff()
+        self.payoff_defender = self.compute_defender_payoff()
 

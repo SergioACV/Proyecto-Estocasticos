@@ -27,5 +27,8 @@ simulator = Simulator(model,initial_state,dt,TOTAL_TIME)
 
 simulator.run()
 
+print(simulator.payoff_defender)
+print(simulator.payoff_attacker)
+
 
 
