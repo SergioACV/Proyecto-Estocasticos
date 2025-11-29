@@ -31,6 +31,16 @@ class Simulator:
         self.S += dS * self.dt 
         self.I += dI * self.dt
 
+        # Asegurar que los valores no sean negativos (estabilidad numérica)
+        self.S = max(0.0, min(self.N, self.S))
+        self.I = max(0.0, min(self.N, self.I))
+        
+        # Normalizar para mantener S + I = N
+        total = self.S + self.I
+        if total > 0:
+            self.S = (self.S / total) * self.N
+            self.I = (self.I / total) * self.N
+
         # Count number of disinfections
         disinf = self.model.disinfections_per_dt(self.I) * self.dt
         self.total_disinfections += disinf
@@ -64,7 +74,13 @@ class Simulator:
             area = 0.5 * (P_prev + P_curr) * dt
             total_area += area
 
-        return total_area / self.total_time
+        gain = total_area / self.total_time
+        
+        # Protección contra NaN/Inf
+        if not (abs(gain) < 1e10):  # Detectar NaN o valores muy grandes
+            return 0.0
+        
+        return gain
     
     def compute_gain_attacker(self):
         """
@@ -82,23 +98,37 @@ class Simulator:
         return self.compute_gain(P_def)
 
     def compute_defender_cost(self):
-        k = self.model.cost_defender  
-        return self.total_disinfections * k
+        """
+        Costo del defensor: inversión en mantener tasa de recuperación r.
+        No depende de cuántas desinfecciones ocurran, sino del nivel de defensa.
+        """
+        return self.model.cost_defender
     
     def compute_attacker_cost(self):
+        """
+        Costo del atacante: inversión en desarrollar malware con tasa beta.
+        """
         return self.model.cost_attacker
 
     def compute_defender_payoff(self):
         """
         Payoff del defensor = Ganancia - Costo
         """
-        return self.gain_defender - self.cost_defender
+        payoff = self.gain_defender - self.cost_defender
+        # Protección contra valores inválidos
+        if not (abs(payoff) < 1e10):
+            return -1e6  # Penalización grande pero finita
+        return payoff
 
     def compute_attacker_payoff(self):
         """
         Payoff del atacante = Ganancia - Costo
         """
-        return self.gain_attacker - self.cost_attacker
+        payoff = self.gain_attacker - self.cost_attacker
+        # Protección contra valores inválidos
+        if not (abs(payoff) < 1e10):
+            return -1e6  # Penalización grande pero finita
+        return payoff
 
     def run(self):
         """Corre la simulación completa."""
