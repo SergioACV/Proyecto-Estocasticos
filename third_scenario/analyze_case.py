@@ -14,7 +14,7 @@ from lib.nash import solve_nash
 # CONFIGURACIÓN
 # ---------------------------------------------------------------
 
-OUTPUT_DIR = "resultados_caso4"
+OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # Condiciones iniciales
@@ -59,9 +59,9 @@ def run_and_plot_case4(beta, gamma, r, lambda_, title, filename):
 
 
 # Figuras similares a Fig 5–7 del paper, pero ahora con (β, γ, r, λ)
-run_and_plot_case4(1.5, 3, 2, 2, "Caso 4: Propagación Alta", "figura_c4_1.png")
-run_and_plot_case4(1.0, 5, 5, 5, "Caso 4: Control Moderado", "figura_c4_2.png")
-run_and_plot_case4(0.6, 8, 8, 12, "Caso 4: Defensa muy fuerte", "figura_c4_3.png")
+run_and_plot_case4(1.5, 3, 2, 2, "Caso 4: Propagación Alta", "PropagaciónAlta.png")
+run_and_plot_case4(1.0, 5, 5, 5, "Caso 4: Control Moderado", "ControlModerado.png")
+run_and_plot_case4(0.6, 8, 8, 12, "Caso 4: Defensa muy fuerte", "DefensaMuyFuerte.png")
 
 
 # ---------------------------------------------------------------
@@ -168,5 +168,69 @@ else:
     plt.tight_layout()
     plt.savefig(os.path.join(OUTPUT_DIR, "nash_mixto_caso4.png"))
     plt.close()
+
+
+# ---------------------------------------------------------------
+# 4. GRÁFICAS EXTRA: PAYOFFS VS PARÁMETROS
+# ---------------------------------------------------------------
+
+print("\nGenerando gráficas extra (Payoff vs parámetros)...")
+
+# ---------------------------
+# Payoff del Defensor vs r
+# ---------------------------
+r_values = np.linspace(0.5, 15, 20)
+payoffs_def_vs_r = []
+
+beta_fixed = 1.5     # fija beta
+gamma_fixed = 5      # fija gamma
+lambda_fixed = 8     # fija lambda
+
+for r_val in r_values:
+    model = UnifiedEpidemicModel(beta_fixed, gamma_fixed, r_val, lambda_fixed)
+    sim = UnifiedSimulator(model, [S0, I0, R0], DT, TOTAL_TIME)
+    sim.run()
+    payoffs_def_vs_r.append(sim.payoff_defender)
+
+plt.figure(figsize=(10, 6))
+plt.plot(r_values, payoffs_def_vs_r, "g-o", linewidth=2)
+plt.title(f"Payoff del Defensor vs Tasa de Recuperación r\n(β={beta_fixed}, γ={gamma_fixed}, λ={lambda_fixed})")
+plt.xlabel("Tasa de recuperación (r)")
+plt.ylabel("Payoff del Defensor")
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.savefig(os.path.join(OUTPUT_DIR, "payoff_def_vs_r.png"))
+plt.close()
+
+print("Generada: payoff_def_vs_r.png")
+
+# ---------------------------
+# Payoff del Atacante vs β
+# ---------------------------
+beta_values = np.linspace(0.5, 3.0, 20)
+payoffs_att_vs_beta = []
+
+gamma_fixed = 5      # fija gamma
+r_fixed = 5          # fija r
+lambda_fixed = 8     # fija lambda
+
+for beta_val in beta_values:
+    model = UnifiedEpidemicModel(beta_val, gamma_fixed, r_fixed, lambda_fixed)
+    sim = UnifiedSimulator(model, [S0, I0, R0], DT, TOTAL_TIME)
+    sim.run()
+    payoffs_att_vs_beta.append(sim.payoff_attacker)
+
+plt.figure(figsize=(10, 6))
+plt.plot(beta_values, payoffs_att_vs_beta, "r-o", linewidth=2)
+plt.title(f"Payoff del Atacante vs Tasa de Infección β\n(γ={gamma_fixed}, r={r_fixed}, λ={lambda_fixed})")
+plt.xlabel("Tasa de infección (β)")
+plt.ylabel("Payoff del Atacante")
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.savefig(os.path.join(OUTPUT_DIR, "payoff_att_vs_beta.png"))
+plt.close()
+
+print("Generada: payoff_att_vs_beta.png")
+
 
 print("\nAnálisis del Caso 4 completado.")
