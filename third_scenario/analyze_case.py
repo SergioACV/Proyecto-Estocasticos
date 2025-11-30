@@ -16,6 +16,7 @@ from lib.nash import solve_nash
 
 OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
+CASE = "Modelo de Diseminación de Malware Unificado"
 
 # Condiciones iniciales
 N = 10000
@@ -30,7 +31,7 @@ DT = 1.0
 # 1. SIMULACIÓN Y GRÁFICAS TEMPORALES
 # ---------------------------------------------------------------
 
-def run_and_plot_case4(beta, gamma, r, lambda_, title, filename):
+def run_and_plot(beta, gamma, r, lambda_, title, filename):
     initial_state = [S0, I0, R0]
     model = UnifiedEpidemicModel(beta, gamma, r, lambda_)
     sim = UnifiedSimulator(model, initial_state, DT, TOTAL_TIME)
@@ -59,16 +60,18 @@ def run_and_plot_case4(beta, gamma, r, lambda_, title, filename):
 
 
 # Figuras similares a Fig 5–7 del paper, pero ahora con (β, γ, r, λ)
-run_and_plot_case4(1.5, 3, 2, 2, "Caso 4: Propagación Alta", "PropagaciónAlta.png")
-run_and_plot_case4(1.0, 5, 5, 5, "Caso 4: Control Moderado", "ControlModerado.png")
-run_and_plot_case4(0.6, 8, 8, 12, "Caso 4: Defensa muy fuerte", "DefensaMuyFuerte.png")
-
+run_and_plot(1.5, 3, 2, 2, "Caso: Propagación Alta", "1. PropagaciónAlta.png")
+run_and_plot(1.0, 5, 5, 5, "Caso: Control Moderado", "2. ControlModerado.png")
+run_and_plot(0.6, 8, 8, 12, "Caso: Defensa muy fuerte", "3. DefensaMuyFuerte.png")
+run_and_plot(12, 0.1, 0.1, 0.1, "Caso: Infección Brutal", "4. InfecciónBrutal.png")
+run_and_plot(0.5, 15, 15, 20, "Caso: Defensa Dominante", "5. DefensaDominante.png")
+run_and_plot(2, 3, 1, 1, "Caso: Equilibrio Oscilatorio O Suave", "6. EquilibrioOscilatorio.png")
 
 # ---------------------------------------------------------------
 # 2. MATRICES DE PAYOFF (EXTENSIÓN DE TABLA 3)
 # ---------------------------------------------------------------
 
-print("\nSimulando Matrices de Payoff para Caso 4...")
+print(f"\nSimulando Matrices de Payoff para {CASE}...")
 
 attacker_betas = [0.5, 1.0, 1.5, 2.0]  
 defender_gammas = [2, 4, 6]
@@ -108,8 +111,8 @@ df_D = pd.DataFrame(
     columns=[f"γ={g}, r={r}, λ={l}" for (g, r, l) in defender_strategies]
 )
 
-df_A.to_csv(os.path.join(OUTPUT_DIR, "payoff_atacante_caso4.csv"))
-df_D.to_csv(os.path.join(OUTPUT_DIR, "payoff_defensor_caso4.csv"))
+df_A.to_csv(os.path.join(OUTPUT_DIR, "payoff_atacante.csv"))
+df_D.to_csv(os.path.join(OUTPUT_DIR, "payoff_defensor.csv"))
 
 print("Matrices guardadas en CSV.")
 
@@ -118,14 +121,14 @@ plt.figure(figsize=(18, 6))
 
 plt.subplot(1, 2, 1)
 sns.heatmap(df_A, annot=False, cmap="Reds")
-plt.title("Payoff del Atacante (Caso 4)")
+plt.title("Payoff del Atacante")
 
 plt.subplot(1, 2, 2)
 sns.heatmap(df_D, annot=False, cmap="Greens")
-plt.title("Payoff del Defensor (Caso 4)")
+plt.title("Payoff del Defensor")
 
 plt.tight_layout()
-plt.savefig(os.path.join(OUTPUT_DIR, "heatmaps_caso4.png"))
+plt.savefig(os.path.join(OUTPUT_DIR, "heatmaps.png"))
 plt.close()
 
 
@@ -133,12 +136,12 @@ plt.close()
 # 3. EQUILIBRIO DE NASH
 # ---------------------------------------------------------------
 
-print("\nBuscando Equilibrio de Nash (Caso 4)...")
+print(f"\nBuscando Equilibrio de Nash para el {CASE}..")
 
 equilibria = solve_nash(payoff_matrix_A, payoff_matrix_D)
 
 if not equilibria:
-    print("No se encontró equilibrio para el Caso 4.")
+    print(f"No se encontró equilibrio para el {CASE}.")
 else:
     eq_p, eq_q = equilibria[0]
     print("\nEquilibrio de Nash encontrado:")
@@ -166,7 +169,7 @@ else:
     plt.xlabel("Estrategias (γ,r,λ)")
 
     plt.tight_layout()
-    plt.savefig(os.path.join(OUTPUT_DIR, "nash_mixto_caso4.png"))
+    plt.savefig(os.path.join(OUTPUT_DIR, "nash_mixto.png"))
     plt.close()
 
 
@@ -233,4 +236,4 @@ plt.close()
 print("Generada: payoff_att_vs_beta.png")
 
 
-print("\nAnálisis del Caso 4 completado.")
+print(f"\nAnálisis del {CASE} completado.")
