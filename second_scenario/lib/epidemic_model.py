@@ -2,7 +2,7 @@ import math
 
 class EpidemicModel:
     """
-    Unified Patch-and-Removal epidemic model (equations 19–21 of the paper):
+    Unified Patch-and-Removal epidemic model:
 
       dS/dt = r*I − β*(I/N)*S − γ*S
       dI/dt = β*(I/N)*S − λ*I − r*I

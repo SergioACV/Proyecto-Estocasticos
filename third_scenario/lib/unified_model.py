@@ -2,7 +2,6 @@
 
 class UnifiedEpidemicModel:
     """
-    Modelo Unificado del paper (Caso 4).
     Tres compartimentos: S, I, R.
     
     Parámetros:

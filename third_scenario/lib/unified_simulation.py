@@ -3,7 +3,6 @@ import math
 
 class UnifiedSimulator:
     """
-    Simulador para el Modelo Unificado (Caso 4).
     Tres compartimentos: S, I, R.
     """
 

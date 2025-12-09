@@ -28,7 +28,7 @@ TOTAL_TIME = 168.0
 DT = 1.0
 
 # ---------------------------------------------------------------
-# 1. SIMULACIÓN Y GRÁFICAS TEMPORALES
+# SIMULACIÓN Y GRÁFICAS TEMPORALES
 # ---------------------------------------------------------------
 
 def run_and_plot(beta, gamma, r, lambda_, title, filename):
@@ -68,7 +68,7 @@ run_and_plot(0.5, 15, 15, 20, "Caso: Defensa Dominante", "5. DefensaDominante.pn
 run_and_plot(2, 3, 1, 1, "Caso: Equilibrio Oscilatorio O Suave", "6. EquilibrioOscilatorio.png")
 
 # ---------------------------------------------------------------
-# 2. MATRICES DE PAYOFF (EXTENSIÓN DE TABLA 3)
+# MATRICES DE PAYOFF
 # ---------------------------------------------------------------
 
 print(f"\nSimulando Matrices de Payoff para {CASE}...")
@@ -133,7 +133,7 @@ plt.close()
 
 
 # ---------------------------------------------------------------
-# 3. EQUILIBRIO DE NASH
+# EQUILIBRIO DE NASH
 # ---------------------------------------------------------------
 
 print(f"\nBuscando Equilibrio de Nash para el {CASE}..")
@@ -173,9 +173,6 @@ else:
     plt.close()
 
 
-# ---------------------------------------------------------------
-# 4. GRÁFICAS EXTRA: PAYOFFS VS PARÁMETROS
-# ---------------------------------------------------------------
 
 print("\nGenerando gráficas extra (Payoff vs parámetros)...")
 

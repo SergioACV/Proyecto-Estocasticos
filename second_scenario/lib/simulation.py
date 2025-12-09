@@ -2,7 +2,7 @@ import pandas as pd
 
 class Simulator:
     """
-    Discrete-time (Euler) simulator for the unified SIR model from the paper.
+    Discrete-time (Euler) simulator.
     It records:
       - Attacker and defender gains
       - Costs

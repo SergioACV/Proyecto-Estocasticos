@@ -19,9 +19,6 @@ S0 = N - I0
 TOTAL_TIME = 168.0 # 1 semana en horas
 DT = 1.0
 
-# ---------------------------------------------------------
-# 1. GENERACIÓN DE GRÁFICAS TEMPORALES (Figuras 5, 6, 7)
-# ---------------------------------------------------------
 def run_and_plot_scenario(beta, r, title, filename):
     initial_state = [S0, I0]
     model = EpidemicModel(beta, r)
@@ -47,18 +44,13 @@ def run_and_plot_scenario(beta, r, title, filename):
     plt.close()
     print(f"Generada: {filename}")
 
-# Escenarios similares al paper
-# Fig 5: Alta infección, baja recuperación
 run_and_plot_scenario(beta=1.62, r=0.5, title="Figura 5: Alta Propagación", filename="figura_5_high_spread.png")
-# Fig 6: Equilibrio medio
+
 run_and_plot_scenario(beta=1.0, r=2.0, title="Figura 6: Control Moderado", filename="figura_6_moderate.png")
-# Fig 7: Defensa fuerte
+
 run_and_plot_scenario(beta=0.5, r=5.0, title="Figura 7: Defensa Fuerte", filename="figura_7_strong_defense.png")
 
 
-# ---------------------------------------------------------
-# 2. CONSTRUCCIÓN DE LA TABLA 3 (MATRIZ DE PAYOFFS)
-# ---------------------------------------------------------
 print("\nSimulando Matriz de Payoffs...")
 
 # Definimos estrategias discretas
@@ -77,7 +69,7 @@ for i, beta in enumerate(attacker_betas):
         payoff_matrix_A[i, j] = sim.payoff_attacker
         payoff_matrix_D[i, j] = sim.payoff_defender
 
-# Guardar en CSV (Representación de la Tabla 3)
+# Guardar en CSV
 df_A = pd.DataFrame(payoff_matrix_A, index=attacker_betas, columns=defender_rs)
 df_D = pd.DataFrame(payoff_matrix_D, index=attacker_betas, columns=defender_rs)
 
@@ -85,7 +77,7 @@ df_A.to_csv(os.path.join(OUTPUT_DIR, "tabla_payoff_atacante.csv"))
 df_D.to_csv(os.path.join(OUTPUT_DIR, "tabla_payoff_defensor.csv"))
 print("Tablas de payoff guardadas.")
 
-# Graficar Heatmaps (Visualización de Tabla 3)
+# Graficar Heatmaps 
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
 
 sns.heatmap(df_A, annot=True, cmap="Reds", fmt=".2f", ax=ax1)
@@ -102,9 +94,7 @@ plt.savefig(os.path.join(OUTPUT_DIR, "tabla_3_heatmaps.png"))
 plt.close()
 
 
-# ---------------------------------------------------------
-# 3. EQUILIBRIO DE NASH Y FIGURAS 8 y 9
-# ---------------------------------------------------------
+#Equilibrio de Nash
 print("\nCalculando Equilibrio de Nash...")
 equilibria = solve_nash(payoff_matrix_A, payoff_matrix_D)
 
@@ -124,15 +114,6 @@ else:
     print(f"Payoff Esperado Atacante: {expected_payoff_A:.4f}")
     print(f"Payoff Esperado Defensor: {expected_payoff_D:.4f}")
 
-    # --- FIGURA 8 y 9: Análisis de sensibilidad alrededor del equilibrio ---
-    # Fig 8 del paper: Payoff del Defensor vs R (fijando Beta en su promedio o mejor respuesta)
-    # Fig 9 del paper: Payoff del Atacante vs Beta
-    
-    # Para replicar el estilo de las figuras 8 y 9, fijamos la estrategia del oponente
-    # en su valor de equilibrio y vemos cómo varía nuestro payoff si cambiamos nuestra estrategia pura.
-    
-    # FIGURA 8: Payoff del Defensor variando R (asumiendo atacante juega equilibrio)
-    # Eje X: R (Defensor), Eje Y: Payoff Defensor
     payoffs_def_vs_r = np.dot(eq_p, payoff_matrix_D) # Promedio ponderado por estrategia de atacante
     
     plt.figure(figsize=(10, 6))
@@ -146,7 +127,6 @@ else:
     plt.savefig(os.path.join(OUTPUT_DIR, "figura_8_nash_defensor.png"))
     plt.close()
 
-    # FIGURA 9: Payoff del Atacante variando Beta (asumiendo defensor juega equilibrio)
     # Eje X: Beta (Atacante), Eje Y: Payoff Atacante
     payoffs_att_vs_beta = np.dot(payoff_matrix_A, eq_q)
     
